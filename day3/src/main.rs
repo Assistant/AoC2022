@@ -32,9 +32,10 @@ fn part1<P: AsRef<Path>>(path: P) -> u32 {
 fn part2<P: AsRef<Path>>(path: P) -> u32 {
     let lines = read_lines(path).unwrap();
     lines
+        .map(|l| l.unwrap())
         .array_chunks::<3>()
         .map(|c| {
-            let [one, two, three] = c.map(|i| i.unwrap().chars().collect::<Vec<char>>());
+            let [one, two, three] = c.map(|i| i.chars().collect::<Vec<char>>());
             value(one.intersect(two.intersect(three))[0])
         })
         .sum()
