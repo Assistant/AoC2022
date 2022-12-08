@@ -22,18 +22,19 @@ fn calculate_score(play: &str) -> u32 {
     let (Some(oponent), Some(me)) = (moves.next(), moves.next()) else {
         panic!("");
     };
-    match (oponent, me) {
-        ("A", "X") => 3 + 1,
-        ("A", "Y") => 6 + 2,
-        ("A", "Z") => 0 + 3,
-        ("B", "X") => 0 + 1,
-        ("B", "Y") => 3 + 2,
-        ("B", "Z") => 6 + 3,
-        ("C", "X") => 6 + 1,
-        ("C", "Y") => 0 + 2,
-        ("C", "Z") => 3 + 3,
-        _ => unreachable!(),
-    }
+    (me.chars().next().unwrap() as u32 - 'W' as u32)
+        + match (oponent, me) {
+            ("A", "X") => 3,
+            ("A", "Y") => 6,
+            ("A", "Z") => 0,
+            ("B", "X") => 0,
+            ("B", "Y") => 3,
+            ("B", "Z") => 6,
+            ("C", "X") => 6,
+            ("C", "Y") => 0,
+            ("C", "Z") => 3,
+            _ => unreachable!(),
+        }
 }
 
 fn part2<P: AsRef<Path>>(path: P) -> u32 {
@@ -46,18 +47,19 @@ fn calculate_score2(play: &str) -> u32 {
     let (Some(oponent), Some(me)) = (moves.next(), moves.next()) else {
         panic!("");
     };
-    match (oponent, me) {
-        ("A", "X") => 0 + 3,
-        ("A", "Y") => 3 + 1,
-        ("A", "Z") => 6 + 2,
-        ("B", "X") => 0 + 1,
-        ("B", "Y") => 3 + 2,
-        ("B", "Z") => 6 + 3,
-        ("C", "X") => 0 + 2,
-        ("C", "Y") => 3 + 3,
-        ("C", "Z") => 6 + 1,
-        _ => unreachable!(),
-    }
+    (me.chars().next().unwrap() as u32 - 'X' as u32) * 3
+        + match (oponent, me) {
+            ("A", "X") => 3,
+            ("A", "Y") => 1,
+            ("A", "Z") => 2,
+            ("B", "X") => 1,
+            ("B", "Y") => 2,
+            ("B", "Z") => 3,
+            ("C", "X") => 2,
+            ("C", "Y") => 3,
+            ("C", "Z") => 1,
+            _ => unreachable!(),
+        }
 }
 
 fn read_lines<P: AsRef<Path>>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>> {

@@ -37,7 +37,7 @@ fn process(
 ) -> u32 {
     let lines = read_lines(path).unwrap();
     lines
-        .map(|l| l.unwrap())
+        .map(Result::unwrap)
         .map(|l| {
             let Some((a,b)) = l.split_once(',') else {
                 unreachable!();

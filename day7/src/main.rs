@@ -56,7 +56,7 @@ fn get_dirs(path: impl AsRef<Path>) -> HashMap<String, Vec<String>> {
 
 fn calculate_size(dir: &Vec<String>, tree: &HashMap<String, Vec<String>>, path: &str) -> u32 {
     dir.iter()
-        .flat_map(|d| d.split_once(" "))
+        .flat_map(|d| d.split_once(' '))
         .map(|v| match v {
             ("dir", dir) => {
                 let path = if path == "/" {

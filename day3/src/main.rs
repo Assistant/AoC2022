@@ -17,7 +17,7 @@ fn main() {
 fn part1<P: AsRef<Path>>(path: P) -> u32 {
     let lines = read_lines(path).unwrap();
     lines
-        .map(|l| l.unwrap())
+        .map(Result::unwrap)
         .map(|l| {
             let (first, second) = l.split_at(l.len() / 2);
             let (first, second) = (
@@ -32,7 +32,7 @@ fn part1<P: AsRef<Path>>(path: P) -> u32 {
 fn part2<P: AsRef<Path>>(path: P) -> u32 {
     let lines = read_lines(path).unwrap();
     lines
-        .map(|l| l.unwrap())
+        .map(Result::unwrap)
         .array_chunks::<3>()
         .map(|c| {
             let [one, two, three] = c.map(|i| i.chars().collect::<Vec<char>>());
