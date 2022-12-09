@@ -19,20 +19,21 @@ fn part1<P: AsRef<Path>>(path: P) -> usize {
     map.iter()
         .enumerate()
         .map(|(row, r)| {
-            if row == 0 || row == height {
-                return r.len();
-            }
             r.iter()
                 .enumerate()
                 .map(|(col, c)| {
-                    (col == 0
-                        || col == width
-                        || r[..col].iter().all(|i| c > i)
-                        || r[col + 1..].iter().all(|i| c > i)
-                        || map[..row].iter().all(|i| *c > i[col])
-                        || map[row + 1..].iter().all(|i| *c > i[col])) as usize
+                    usize::from(
+                        col == 0
+                            || col == width
+                            || row == 0
+                            || row == height
+                            || r[..col].iter().all(|i| c > i)
+                            || r[col + 1..].iter().all(|i| c > i)
+                            || map[..row].iter().all(|i| *c > i[col])
+                            || map[row + 1..].iter().all(|i| *c > i[col]),
+                    )
                 })
-                .sum()
+                .sum::<usize>()
         })
         .sum()
 }
@@ -41,10 +42,10 @@ fn part2<P: AsRef<Path>>(path: P) -> usize {
     let (map, width, height) = get_matix(path);
     map.iter()
         .enumerate()
-        .flat_map(|(row, r)| {
+        .filter_map(|(row, r)| {
             r.iter()
                 .enumerate()
-                .flat_map(|(col, c)| {
+                .map(|(col, c)| {
                     [
                         r[..col].iter().rev().take_while(|&i| c > i).count(),
                         r[col + 1..].iter().take_while(|&i| c > i).count(),
@@ -52,11 +53,10 @@ fn part2<P: AsRef<Path>>(path: P) -> usize {
                         map[row + 1..].iter().take_while(|&i| *c > i[col]).count(),
                     ]
                     .zip([col > 0, col < width, row > 0, row < height])
-                    .map(|(a, b)| a + b as usize)
                     .zip([col, width - col, row, height - row])
-                    .map(|(a, b)| min(a, b))
-                    .into_iter()
-                    .reduce(|a, n| a * n)
+                    .map(|((a, b), c)| min(a + usize::from(b), c))
+                    .iter()
+                    .product()
                 })
                 .max()
         })
