@@ -13,17 +13,16 @@ fn main() {
 }
 
 fn part1<P: AsRef<Path>>(path: P) -> usize {
-    let mut tail = (0, 0);
-    process(path, &mut |h| follow(h, &mut tail))
+    process::<1>(path)
 }
 
 fn part2<P: AsRef<Path>>(path: P) -> usize {
-    let mut tails = [(0, 0); 9];
-    process(path, &mut |h| tails.iter_mut().fold(h, follow))
+    process::<9>(path)
 }
 
-fn process<P: AsRef<Path>, F: FnMut((i32, i32)) -> (i32, i32)>(path: P, func: &mut F) -> usize {
+fn process<const N: usize>(path: impl AsRef<Path>) -> usize {
     let mut head = (0, 0);
+    let mut segments = [(0, 0); N];
     let commands = get_moves(path);
     commands
         .iter()
@@ -31,13 +30,13 @@ fn process<P: AsRef<Path>, F: FnMut((i32, i32)) -> (i32, i32)>(path: P, func: &m
             (0..*a)
                 .map(|_| {
                     match *d {
-                        'R' => head = (head.0 + 1, head.1),
-                        'L' => head = (head.0 - 1, head.1),
-                        'U' => head = (head.0, head.1 + 1),
-                        'D' => head = (head.0, head.1 - 1),
+                        'R' => head.0 += 1,
+                        'L' => head.0 -= 1,
+                        'U' => head.1 += 1,
+                        'D' => head.1 -= 1,
                         _ => unreachable!(),
                     }
-                    func(head)
+                    segments.iter_mut().fold(head, follow)
                 })
                 .collect::<Vec<(i32, i32)>>()
         })
@@ -47,14 +46,10 @@ fn process<P: AsRef<Path>, F: FnMut((i32, i32)) -> (i32, i32)>(path: P, func: &m
 
 fn follow(head: (i32, i32), tail: &mut (i32, i32)) -> (i32, i32) {
     match (head.0 - tail.0, head.1 - tail.1) {
-        (a, b) if a > 1 && b == 0 => *tail = (tail.0 + 1, tail.1),
-        (a, b) if a == 0 && b > 1 => *tail = (tail.0, tail.1 + 1),
-        (a, b) if a < -1 && b == 0 => *tail = (tail.0 - 1, tail.1),
-        (a, b) if a == 0 && b < -1 => *tail = (tail.0, tail.1 - 1),
-        (a, b) if a + b > 2 => *tail = (tail.0 + 1, tail.1 + 1),
-        (a, b) if a + b.abs() > 2 => *tail = (tail.0 + 1, tail.1 - 1),
-        (a, b) if a.abs() + b > 2 => *tail = (tail.0 - 1, tail.1 + 1),
-        (a, b) if a + b < -2 => *tail = (tail.0 - 1, tail.1 - 1),
+        (a, b) if a.abs() > 1 || b.abs() > 1 => {
+            tail.0 += a.signum();
+            tail.1 += b.signum();
+        }
         _ => {}
     }
     *tail
