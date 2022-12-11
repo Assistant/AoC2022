@@ -23,8 +23,7 @@ fn part2<P: AsRef<Path>>(path: P) -> usize {
 fn process<const N: usize>(path: impl AsRef<Path>) -> usize {
     let mut head = (0, 0);
     let mut segments = [(0, 0); N];
-    let commands = get_moves(path);
-    commands
+    get_moves(path)
         .iter()
         .flat_map(|(d, a)| {
             (0..*a)
@@ -56,8 +55,8 @@ fn follow(head: (i32, i32), tail: &mut (i32, i32)) -> (i32, i32) {
 }
 
 fn get_moves<P: AsRef<Path>>(path: P) -> Vec<(char, usize)> {
-    let input = read_to_string(path).unwrap();
-    input
+    read_to_string(path)
+        .unwrap()
         .trim()
         .split('\n')
         .map(|l| {
