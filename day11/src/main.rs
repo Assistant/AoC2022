@@ -49,10 +49,9 @@ fn process<const N: usize, const K: u64>(path: impl AsRef<Path>) -> u64 {
                     .value("old", item)
                     .exec() else {unreachable!()};
                 let value = value.as_u64().unwrap() / K;
-                let target = if value % m.divisor == 0 {
-                    m.target.0
-                } else {
-                    m.target.1
+                let target = match value % m.divisor == 0 {
+                    true => m.target.0,
+                    false => m.target.1,
                 };
                 monkeys.get(&target).unwrap().borrow_mut().items.push(value);
             }
