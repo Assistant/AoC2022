@@ -6,7 +6,7 @@ use std::{cmp::Ordering, fs::read_to_string, path::Path};
 
 static FILE: &str = "input.txt";
 
-#[derive(Clone, Debug, Ord, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 enum Signal {
     List(Vec<Signal>),
     Item(u8),
@@ -14,19 +14,17 @@ enum Signal {
 
 impl PartialOrd for Signal {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Signal {
+    fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
-            (Self::Item(a), Self::Item(b)) => a.partial_cmp(b),
-            (Self::List(a), Self::List(b)) => {
-                let list = a.iter().zip(b).flat_map(|(a, b)| a.partial_cmp(b));
-                for value in list {
-                    if [Ordering::Less, Ordering::Greater].contains(&value) {
-                        return Some(value);
-                    }
-                }
-                a.len().partial_cmp(&b.len())
-            }
-            (Self::List(a), b) => Self::List(a.clone()).partial_cmp(&Self::List(vec![b.clone()])),
-            (a, b) => (*b).partial_cmp(a).map(Ordering::reverse),
+            (Self::Item(a), Self::Item(b)) => a.cmp(b),
+            (Self::List(a), Self::List(b)) => a.cmp(b),
+            (Self::List(a), b) => Self::List(a.clone()).cmp(&Self::List(vec![b.clone()])),
+            (a, b) => (*b).cmp(a).reverse(),
         }
     }
 }
@@ -78,7 +76,7 @@ fn list(input: &str) -> IResult<&str, Signal> {
 }
 
 fn item(input: &str) -> IResult<&str, Signal> {
-    map_res(digit1, str::parse)(input).map(|(i, v)| (i, Signal::Item(v)))
+    map_res(digit1, |i: &str| i.parse().map(|i| Signal::Item(i)))(input)
 }
 
 fn get_signals<P: AsRef<Path>>(path: P) -> Vec<[Signal; 2]> {
