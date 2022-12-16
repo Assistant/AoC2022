@@ -1,1 +1,0 @@
-EVCXR_BEGIN_CONTENT image/png
